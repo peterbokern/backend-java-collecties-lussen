@@ -1,66 +1,81 @@
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class Bonus {
 
     public static void main(String[] args) {
 
-        // Onderstaande code is uitgecommentarieerd. Haal de code uit de comment (delete /* en */) om aan de slag te gaan met de bonus
-        // In de code staan op verschillende plekken comments tussen "/*...*/" als hint wat je moet doen
+        HashSet<Integer> secretNumber = randomNumberGenerator();
+        String stringNumber = setToStringConverter(secretNumber);
 
+        System.out.println("+ = juiste nummer op de juiste plek, O = juiste nummer verkeerde plek, X = verkeerde nummer");
+        System.out.println("Doe een gok, Let op vul 4 getallen in. Typ 'quit' om te stoppen");
 
-        HashSet<Integer> secretnumber = randomnumbergenerator();
-        String stringnumber = setToStringConverter(secretnumber);
-        System.out.println(stringnumber);
-        feedback(/*vul hier het juiste argument in*/);
-
+        feedback(stringNumber);
     }
 
-    public static void/*moet dit returntype "void" zijn of wat anders?*/ randomnumbergenerator(/*Heeft deze methode nog parameter(s) nodig?*/){
-         /*
-        Vul hier de body van de methode in.
+    private static HashSet<Integer> randomNumberGenerator() {
 
-        Stappenplan:
-        - Maak een nieuwe variabele van type Random. (Tip: Zoek op internet hoe je Random kunt gebruiken)
-        - Maak een nieuwe variabele van type HashSet.
-        - Schrijf een while-loop om 4 random nummers aan de hashset toe te voegen
-        - return de hashset
-         */
+        Random random = new Random();
+        HashSet<Integer> numbers = new HashSet<>();
+
+        //get new number if number is not unique
+        while (numbers.size() < 4) {
+            int randomNumber = random.nextInt(10);
+            numbers.add(randomNumber);
+        }
+        return numbers;
     }
 
-    public static void/*moet dit returntype "void" zijn of wat anders?*/ setToStringConverter(/*Heeft deze methode nog parameter(s) nodig?*/){
-        /*
-        Vul hier de body van de methode in.
-
-        Stappenplan:
-        - Maak als eerst een String variabele met als waarde een lege String. (of gebruik een StringBuilder)
-        - Schrijf vervolgens een for-loop om de items in de hashset een voor een aan de String variabele toe te voegen.
-        - Return de (gevulde) String variabele
-         */
+    private static String setToStringConverter(HashSet<Integer> numbers) {
+        StringBuilder sb = new StringBuilder();
+        for (Integer number : numbers) {sb.append(number);}
+        return sb.toString();
     }
 
-
-
-    public static void/*moet dit "void" zijn of wat anders?*/ feedback(String stringnumber) {
+    private static void feedback(String stringNumber) {
         Scanner scanner = new Scanner(System.in);
         StringBuilder feedback = new StringBuilder();
-        System.out.println("+ = juiste nummer op de juiste plek, O = juiste nummer verkeerde plek, X = verkeerde nummer");
-        System.out.println("Doe een gok, Let op vul 4 getallen in.");
-        String guess = scanner.nextLine();
-        if (Objects.equals(guess, stringnumber)) {
-            System.out.println("gefeliciteerd je hebt het goed");
-        } else {
-            for (int i = 0; i < 4; i++) {
-                if (guess.substring(i, i + 1).equals(stringnumber.substring(i, i + 1))) {
-                    feedback.append("+");
-                } else if (stringnumber.contains(guess.substring(i, i + 1))) {
-                    feedback.append("0");
-                } else {
-                    feedback.append("X");
+
+        while (true) {
+            String guess = scanner.nextLine();
+            feedback.delete(0, feedback.length()); //clear feedback
+
+            //input validation
+            if (guess.length() != 4 || !isNumeric(guess)) {
+                feedback.append("Ongeldige invoer, voer 4 getallen in tussend de 0 en 9");
+            }
+
+            //correct input
+            else if (Objects.equals(guess, stringNumber)) {
+                System.out.println("gefeliciteerd je hebt het goed!");
+                break;
+            }
+
+            //quit
+            else if (Objects.equals(guess, "quit")) {
+                feedback.append("tot ziens");
+                break;
+            }
+
+            else {
+                for (int i = 0; i < 4; i++) {
+                    if (guess.substring(i, i + 1).equals(stringNumber.substring(i, i + 1))) {
+                        feedback.append("+");
+                    } else if (stringNumber.contains(guess.substring(i, i + 1))) {
+                        feedback.append("0");
+                    } else {
+                        feedback.append("X");
+                    }
                 }
             }
+            System.out.println(feedback.toString());
         }
-        System.out.println(feedback.toString());
+    }
+
+    private static boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+        } catch (NumberFormatException e) {return false;}
+        return true;
     }
 }
